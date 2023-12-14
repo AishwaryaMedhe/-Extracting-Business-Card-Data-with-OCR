@@ -292,7 +292,7 @@ if st.session_state.authentication_status==True:
                 data1,data2=data()
                 st.table(data1)
             #let the user to process desired actions
-            sb1 = st.selectbox("SQL Options", ['Read Data from SQL', 'Export the Data to SQL'])
+            sb1 = st.selectbox("SQL Options", ['Read Data from SQL', 'Export the Data to SQL', 'Delete Data from SQL'])
             #established connection to mysql
             mycon = mysql.connector.connect(host="127.0.0.1", user="root", password="Dreamer_1")
             mycursor = mycon.cursor()
@@ -328,10 +328,25 @@ if st.session_state.authentication_status==True:
                         image_stream = BytesIO(imgdata)
                         image_open = Image.open(image_stream)
                         st.image(image_open)
-
+            # process only if the user wish to delete the data with respect to the name of the card holder from mysql database
+            if sb1 == 'Delete Data from SQL':
+                delq = f"SELECT DISTINCT Name FROM bizcard.data"
+                del_df = pd.read_sql(delq, con=mycon)
+                del_list = del_df['Name'].tolist()
+                sb2=st.selectbox("Select Name of Data to be deleted",del_list)
+                if st.button("Delete") and sb2:
+                    mycon = mysql.connector.connect(host="127.0.0.1", user="root", password="Dreamer_1")
+                    mycursor = mycon.cursor()
+                    delete_query = f"DELETE FROM bizcard.data WHERE Name = '{sb2}' LIMIT 1"
+                    mycursor.execute(delete_query)
+                    mycon.commit()
+                    st.write(sb2)
+                    st.success("Deleted Successfully!")
+                    st.balloons()
+                    mycon.close()
         #process if file is not detected in uploader
         else:
-            sb1 = st.selectbox("SQL Options", ['Read Data from SQL', 'Export the Data to SQL'])
+            sb1 = st.selectbox("SQL Options", ['Read Data from SQL', 'Export the Data to SQL', 'Delete Data from SQL'])
             mycon = mysql.connector.connect(host="127.0.0.1", user="root", password="Dreamer_1")
             mycursor = mycon.cursor()
             mycursor.execute(f"CREATE DATABASE IF NOT EXISTS bizcard;")
@@ -360,7 +375,22 @@ if st.session_state.authentication_status==True:
                         image_stream = BytesIO(imgdata)
                         image_open = Image.open(image_stream)
                         st.image(image_open)
-
+            # process only if the user wish to delete the data with respect to the name of the card holder from mysql database
+            if sb1 == 'Delete Data from SQL':
+                delq = f"SELECT DISTINCT Name FROM bizcard.data"
+                del_df = pd.read_sql(delq, con=mycon)
+                del_list = del_df['Name'].tolist()
+                sb2 = st.selectbox("Select Name of Data to be deleted", del_list)
+                if st.button("Delete") and sb2:
+                    mycon = mysql.connector.connect(host="127.0.0.1", user="root", password="Dreamer_1")
+                    mycursor = mycon.cursor()
+                    delete_query = f"DELETE FROM bizcard.data WHERE Name = '{sb2}' LIMIT 1"
+                    mycursor.execute(delete_query)
+                    mycon.commit()
+                    st.write(sb2)
+                    st.success("Deleted Successfully!")
+                    st.balloons()
+                    mycon.close()
     #block of code to define the author data
     elif nav=='About Page':
         st.title(":dart: About Page")
@@ -372,3 +402,11 @@ if st.session_state.authentication_status==True:
         st.info("https://github.com/AishwaryaMedhe")
 
 
+
+ 
+
+
+
+
+ 
+  
